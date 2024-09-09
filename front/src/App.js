@@ -72,8 +72,8 @@ function Content() {
         <Table fontSize='18px' variant='striped' colorScheme='black'>
           <Thead>
             <Tr>
-              <Th>Van</Th>
-              <Th>Bericht</Th>
+              <Th>Pseudo</Th>
+              <Th>Message</Th>
             </Tr>
           </Thead>
           <Tbody>
