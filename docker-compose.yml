@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "8080:15672"  # Expose RabbitMQ management console
+      - "5672:5672"    # Expose RabbitMQ messaging port
+    networks:
+      - my-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "10101:10101"  # Expose WebSocket server
+    networks:
+      - my-network
+    environment:
+      - RABBITMQ_HOST=amqp://rabbitmq  # Set RabbitMQ host as an environment variable
+    depends_on:
+      - rabbitmq  # Ensure RabbitMQ starts before backend
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"  # Expose React app
+    networks:
+      - my-network
+    depends_on:
+      - backend
+
+networks:
+  my-network:
+    driver: bridge
