@@ -1,6 +1,8 @@
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const { connectToRabbitMQ, publishMessage } = require('./rabbitmq');
+const os = require('os');
+const process = require('process');
 
 const wss = new WebSocket.WebSocketServer({
     port: 10101,
@@ -64,6 +66,12 @@ wss.on('connection', function connection(ws) {
             publishMessage(messageWithId);
             broadcast(messageWithId);
         }
+
+        // Commande de monitoring pour afficher l'état du serveur
+        else if (parsedData.type === 'monitor') {
+            const stats = getServerStats();
+            ws.send(JSON.stringify({ type: 'monitor_stats', stats }));
+        }
     });
 
     function broadcast(data) {
@@ -75,3 +83,22 @@ wss.on('connection', function connection(ws) {
         });
     }
 });
+
+// Fonction de monitoring pour obtenir les statistiques du serveur
+function getServerStats() {
+    return {
+        memoryUsage: process.memoryUsage(),
+        cpuUsage: process.cpuUsage(),
+        loadAverage: os.loadavg(),
+        uptime: os.uptime(),
+        freeMemory: os.freemem(),
+        totalMemory: os.totalmem(),
+        activeConnections: wss.clients.size,
+    };
+}
+
+// Monitoring en temps réel toutes les 10 secondes
+setInterval(() => {
+    const stats = getServerStats();
+    console.log('Server Monitoring Stats:', stats);
+}, 10000);

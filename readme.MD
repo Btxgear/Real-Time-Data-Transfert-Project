@@ -9,12 +9,13 @@
 3. [Démo de Fonctionnement](#démo-de-fonctionnement)
    - [Pré-requis](#pré-requis)
    - [Instructions de Démarrage](#instructions-de-démarrage)
-   - [Scénario de Démo](#scénario-de-démo)
-4. [Conclusion](#conclusion)
+   - [Accès](#accès)
+   - [Scénarios](#scénarios)
 
 ## Introduction
 
-Ce projet implémente un système de messagerie asynchrone utilisant RabbitMQ pour gérer la communication entre les producteurs et les consommateurs. Il est conçu pour illustrer les concepts de routage de messages, de gestion de files d'attente et de sécurité dans un système distribué.
+Ce projet implémente un système de messagerie asynchrone utilisant RabbitMQ pour gérer la communication entre les producteurs et les consommateurs. Il est conçu pour illustrer les concepts de routage de messages, de gestion de files d'attente et de sécurité dans un système distribué.<br>
+Le projet est monitoré au niveau backend pour avoir une vision globale de l'utilisation des performances et du nombre de connexion actives, une petite fenêtre résumant ces données s'affiche toutes les 10 secondes dans les logs du serveur.
 
 ## Architecture du Système
 
@@ -83,4 +84,35 @@ http://localhost:3000
 - Se connecter en tant que guest
   - Accès au chat général + ceux ouvert par les admins (APRES s'être connecté)
   - Gestion d'envoi d'image
+
+# Scénarios
+
+## Scénario 1 : Création d'un Canal par un Administrateur
+
+### Description :
+Un administrateur se connecte au système, crée un nouveau canal, et tous les utilisateurs connectés reçoivent une notification du nouveau canal.
+
+### Étapes :
+1. L'administrateur ouvre le navigateur et accède à l'application à [http://localhost:3000](http://localhost:3000).
+2. Il clique sur le bouton **Admin** et entre les informations de connexion :
+   - **Nom d'utilisateur** : `admin`
+   - **Mot de passe** : `root`
+3. Après une authentification réussie, l'interface de chat s'ouvre.
+4. L'administrateur saisit le nom d'un nouveau canal, par exemple **"Développement"**, dans le champ "Nom du nouveau channel".
+5. L'administrateur clique sur **Ajouter Channel**.
+6. Le nouveau canal **"Développement"** apparaît dans la liste des canaux pour tous les utilisateurs connectés.
+7. Les utilisateurs déjà connectés peuvent maintenant rejoindre et discuter dans le nouveau canal créé par l'administrateur.
+
+## Scénario 2 : Envoi de Messages dans un Canal
+
+### Description :
+Un utilisateur invité envoie un message dans un canal spécifique, et le message est reçu par tous les utilisateurs connectés au même canal.
+
+### Étapes :
+1. L'utilisateur invité ouvre le navigateur et accède à l'application à [http://localhost:3000](http://localhost:3000).
+2. Il clique sur le bouton **Invité** et choisit un pseudonyme, par exemple **"Jean"**.
+3. L'utilisateur entre dans le chat et rejoint le canal par défaut **"general"**.
+4. L'utilisateur saisit un message, par exemple **"Bonjour à tous !"**, dans le champ de texte et clique sur le bouton d'envoi.
+5. Tous les utilisateurs actuellement dans le canal **"general"** reçoivent immédiatement le message **"Jean : Bonjour à tous !"**.
+6. Si l'utilisateur change de canal (par exemple vers **"Développement"**), il ne reçoit que les messages de ce canal, et les autres messages sont filtrés.
 
