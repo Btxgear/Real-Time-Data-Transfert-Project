@@ -10,14 +10,17 @@ function Contenu({ nom, isAdmin, userId, sendMessage, channels, setChannels }) {
     const [modalImage, setModalImage] = useState(null);
     const [newChannelName, setNewChannelName] = useState('');
 
+    // Hnadle du write du message par l'user
     const handleSetMessage = (event) => {
         setMessage(event.target.value);
     };
 
+    // Handle de la sélection d'image par l'utilisateur
     const handleSetImage = (event) => {
         setImage(event.target.files[0]);
     };
 
+    // Handle du changement de channel par l'utilisateur
     const handleChannelChange = (newChannel) => {
         setChannel(newChannel);
         sendMessage(JSON.stringify({ type: 'switchChannel', channel: newChannel }));
@@ -32,11 +35,13 @@ function Contenu({ nom, isAdmin, userId, sendMessage, channels, setChannels }) {
         }
     };
 
+    // Requete au backend de l'envoi d'un message par un utilisateur donnée sur un channel donné
     const envoyerMessage = () => {
         sendMessage(JSON.stringify({ type: 'message', username: nom, message: message.trim(), channel, userId }));
         setMessage('');
     };
 
+    // Requete au backend de l'envoi d'une image par un utilisateur donnée sur un channel donné
     const envoyerImage = () => {
         if (image) {
             const reader = new FileReader();
@@ -55,19 +60,23 @@ function Contenu({ nom, isAdmin, userId, sendMessage, channels, setChannels }) {
         }
     };
 
+    // Gestion du click sur l'image
     const openImageModal = (src) => {
         setModalImage(src);
     };
 
+    // Gestion de la fermeture de l'image agrandie
     const closeImageModal = () => {
         setModalImage(null);
     };
 
+    // Constante pour avoir le dernier message
     const { lastMessage } = useWebSocket('ws://localhost:10101', {
         share: true,
         shouldReconnect: () => false,
     });
 
+    // Methode gérant l'affichage des messages pour un client
     useEffect(() => {
         if (lastMessage !== null) {
             try {
@@ -97,7 +106,7 @@ function Contenu({ nom, isAdmin, userId, sendMessage, channels, setChannels }) {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>HiddeChat</h1>
+                <h1>Live Chat Project</h1>
                 <Flex>
                     <VStack spacing={4} align="stretch" maxW="200px" border="1px solid #ddd" p={2} borderRadius="md" bg="white">
                         {channels.map((ch) => (

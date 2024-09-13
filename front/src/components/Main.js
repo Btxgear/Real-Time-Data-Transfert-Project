@@ -4,6 +4,7 @@ import useWebSocket from 'react-use-websocket';
 import Contenu from './Contenu';
 
 function Main() {
+    // Definition des variables utilisées
     const [nom, setNom] = useState('');
     const [isChatActive, setIsChatActive] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,11 +15,14 @@ function Main() {
     const [channels, setChannels] = useState(['general']);
     const [userId, setUserId] = useState(null);
 
+    // Set du nom sur la page d'auth
     const handleSetNom = (event) => {
         setNom(event.target.value);
     };
 
+    // Au moment d'entrer sur le chat (après el click du bouton sur la page de connexion)
     const startChat = () => {
+        // Gestion de l'authentification Admin/Invité
         if (loginType === 'admin' && username.trim() && password.trim()) {
             authenticate(username, password);
         } else if (loginType === 'guest' && nom.trim()) {
@@ -28,6 +32,7 @@ function Main() {
         }
     };
 
+    // Envoi au backEnd de la demande d'authentification
     const authenticate = (username, password) => {
         sendMessage(JSON.stringify({ type: 'auth', username, password }));
     };
@@ -35,15 +40,19 @@ function Main() {
     const { sendMessage } = useWebSocket('ws://localhost:10101', {
         onMessage: (message) => {
             const msg = JSON.parse(message.data);
+            // Retour backend = succès d'authentification
             if (msg.type === 'auth_success') {
                 setIsAuthenticated(true);
                 setIsAdmin(msg.isAdmin);
                 setUserId(msg.userId);
                 setIsChatActive(true);
+            // Retour BackEnd = authentification failure
             } else if (msg.type === 'auth_failed') {
                 alert('Échec de l\'authentification');
+            // Retour BackEnd = Création de channel
             } else if (msg.type === 'new_channel') {
                 setChannels((prev) => [...prev, msg.channel]);
+            // Retour backEnd = connexion utilisateur
             } else if (msg.type === 'user_connected') {
                 setUserId(msg.userId);
             }
@@ -63,7 +72,7 @@ function Main() {
     ) : (
         <div className="App">
             <header className="App-header">
-                <h1>Bienvenue sur HiddeChat</h1>
+                <h1>Welcome to this Live Chat Project</h1>
                 <HStack spacing={4}>
                     <Button onClick={() => handleLoginTypeChange('guest')}>Invité</Button>
                     <Button onClick={() => handleLoginTypeChange('admin')}>Admin</Button>
